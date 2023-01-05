@@ -12,9 +12,10 @@ export default function useScroll(wrapperRef, options, emit) {
       observeDOM: true,
       ...options
     })
-
+    // 监听位置变化
     if (options.probeType > 0) {
       scrollVal.on('scroll', (pos) => {
+        // 把滚动位置信息发送出去
         emit('scroll', pos)
       })
     }

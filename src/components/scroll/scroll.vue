@@ -12,6 +12,7 @@ import { ref } from 'vue'
 export default {
   name: 'scroll',
   props: {
+    // scroll组件的参数
     click: {
       type: Boolean,
       default: true
