@@ -1,0 +1,40 @@
+// 定义基本样式
+
+body, html {
+  line-height: 1;
+  font-family: 'PingFang SC', 'STHeitiSC-Light', 'Helvetica-Light', arial, sans-serif, 'Droid Sans Fallback';
+  user-select: none;//  控制用户能否选中文本
+  -webkit-tap-highlight-color: transparent;// 设置点击链接的时候出现的高亮颜色
+  background: $color-background;
+  color: $color-text;
+}
+
+.g-relative {
+  position: relative;
+}
+
+.slide-enter-active, .slide-leave-active {
+  transition: all 0.3s
+}
+
+.slide-enter-from, .slide-leave-to {
+  transform: translate3d(100%, 0, 0)
+}
+
+.list-enter-active, .list-leave-active {
+  transition: all 0.3s;
+}
+
+.list-enter-from, .list-leave-to {
+  height: 0 !important;
+}
+
+//创建动画：通过逐步改变从一个CSS样式设定到另一个
+@keyframes rotate {
+  0% {
+    transform: rotate(0)
+  }
+  100% {
+    transform: rotate(360deg)
+  }
+}

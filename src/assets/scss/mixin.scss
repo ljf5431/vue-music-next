@@ -1,0 +1,32 @@
+// 混合指令（Mixin）用于定义可重复使用的样式
+// 用法是在 @mixin 后添加名称与样式
+
+// 背景图片
+@mixin bg-image($url) {
+  background-image: url($url + "@2x.png");
+//  @media的作用：媒体查询可以在指定的设备上使用对应的样式替代原有的样式。
+//  可以简单理解为：告诉浏览器，当满足某条件时，调用某样式。当满足条件A时，调用A样式； 当满足条件B时，调用B样式。
+  @media (-webkit-min-device-pixel-ratio: 3), (min-device-pixel-ratio: 3) {
+    background-image: url($url + "@3x.png");
+  }
+}
+
+// 禁止折行 超出包含元素大小时
+@mixin no-wrap() {
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+// 扩展小图标按钮的点击区域
+@mixin extend-click() {
+  position: relative;
+  &:before {
+    content: '';
+    position: absolute;
+    top: -10px;
+    left: -10px;
+    right: -10px;
+    bottom: -10px;
+  }
+}
