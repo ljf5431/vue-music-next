@@ -3,6 +3,7 @@
     class="index-list"
     :probe-type="3"
     @scroll="onScroll"
+    ref="scrollRef"
   >
     <!--整个列表-->
     <ul ref="groupRef">
@@ -20,6 +21,7 @@
             v-for="item in group.list"
             :key="item.id"
             class="item"
+            @click="onItemClick(item)"
           >
             <img class="avatar" v-lazy="item.pic">
             <span class="name">{{item.name}}</span>
@@ -35,16 +37,44 @@
     >
       <div class="fixed-title">{{fixedTitle}}</div>
     </div>
+    <!--快速导航栏-->
+    <div
+      class="shortcut"
+      @touchstart.stop.prevent="onShortcutTouchStart"
+      @touchmove.stop.prevent="onShortcutTouchMove"
+      @touchend.stop.prevent
+    >
+      <!--
+        touchstart会在你第一次触碰到它时候触发
+        touchmove就是你一直点着不松手的时候触发
+        touchend就是你的手刚刚移开的时候触发
+        .stop 阻止冒泡 冒泡就是子元素的事件传递到父元素
+        .prevent 阻止默认事件
+      -->
+      <ul>
+        <li
+          v-for="(item, index) in shortcutList"
+          :key="item"
+          :data-index="index"
+          class="item"
+          :class="{'current':currentIndex===index}"
+        >{{item}}
+        </li>
+      </ul>
+    </div>
   </scroll>
 </template>
 
 <script>
 import Scroll from '@/components/scroll/scroll'
-import useFixed from './use-fixed'
+import useFixed from './use-fixed' // 获取固定吸顶标题的内容
+import useShortcut from './use-shortcut'
 
 export default {
   name: 'index-list',
   components: { Scroll },
+  // emits用于声明由组件触发的自定义事件
+  emits: ['select'],
   // props 接收页面传递的数据
   props: {
     data: {
@@ -54,15 +84,30 @@ export default {
       }
     }
   },
-  setup(props) {
-    // groupRef对应整个列表的DOM
-    const { groupRef, onScroll, fixedTitle, fixedStyle } = useFixed(props)
+  setup(props, { emit }) {
+    // 获取固定吸顶标题的内容
+    const { groupRef, onScroll, fixedTitle, fixedStyle, currentIndex } = useFixed(props)
+    // 快速导航栏的内容
+    const { shortcutList, scrollRef, onShortcutTouchStart, onShortcutTouchMove } = useShortcut(props, groupRef)
+    // 点击跳转事件
+    function onItemClick(item) {
+      // 发送事件，传递数据
+      emit('select', item)
+    }
     // 返回到use-fixed模板上
     return {
-      groupRef,
-      onScroll,
-      fixedTitle,
-      fixedStyle
+      onItemClick, // 点击跳转事件
+      // fixed返回的
+      groupRef, // groupRef对应整个列表的DOM
+      onScroll, // 监听滚动距离
+      fixedTitle, // 得到当前列表的标题
+      fixedStyle, // 判断是否添加标题上移效果
+      currentIndex, // 表示当前列表的索引值
+      // shortcut返回的
+      shortcutList, // 字母标题
+      scrollRef, // scroll组件实例
+      onShortcutTouchStart, // 点击滚动到目标列表位置
+      onShortcutTouchMove // 长按拖动到目标列表位置
     }
   }
 }
@@ -113,6 +158,27 @@ export default {
       font-size: $font-size-small;
       color: $color-text-l;
       background: $color-highlight-background;
+    }
+  }
+  .shortcut {
+    position: absolute;
+    right: 4px;
+    top: 50%;
+    transform: translateY(-50%);// 在页面垂直移动元素
+    width: 20px;
+    padding: 20px 0;
+    border-radius: 10px;
+    text-align: center;
+    background: $color-background-d;
+    font-family: Helvetica;
+    .item {
+      padding: 3px;
+      line-height: 1;
+      color: $color-text-l;
+      font-size: $font-size-small;
+      &.current {
+        color: $color-theme
+      }
     }
   }
 }

@@ -1,3 +1,4 @@
+// 请求的封装
 import axios from 'axios'
 
 const ERR_OK = 0

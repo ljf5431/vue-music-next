@@ -1,9 +1,10 @@
-// 获取吸顶标题的内容
+// 获取固定吸顶标题的内容
 import { ref, watch, nextTick, computed } from 'vue'
 
 export default function useFixed(props) {
+  // groupRef对应整个列表的DOM
   const groupRef = ref(null)
-  // TITLE_HEIGHT为标题自身的高度
+  // TITLE_HEIGHT为列表标题自身的高度
   const TITLE_HEIGHT = 30
   // listHeights 动态记录字母标题的高度
   const listHeights = ref([])
@@ -86,6 +87,7 @@ export default function useFixed(props) {
     groupRef,
     onScroll,
     fixedTitle,
-    fixedStyle
+    fixedStyle,
+    currentIndex
   }
 }
