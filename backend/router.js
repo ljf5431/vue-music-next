@@ -54,11 +54,11 @@ function get(url, params) {
 // 修改请求的 headers 值
 function post(url, params) {
   return axios.post(url, params, {
-    headers: {
-      referer: 'https://y.qq.com/',
-      origin: 'https://y.qq.com/',
-      'Content-Type': 'application/x-www-form-urlencoded'
-    }
+    // headers: {
+    //   referer: 'https://y.qq.com/',
+    //   origin: 'https://y.qq.com/',
+    //   'Content-Type': 'application/x-www-form-urlencoded'
+    // }
   })
 }
 

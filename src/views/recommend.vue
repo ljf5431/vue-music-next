@@ -43,7 +43,7 @@
 <script>
   import { getRecommend } from '@/service/recommend' // 轮播图的请求方法
   import Slider from '@/components/base/slider/slider' // 轮播图组件
-  import Scroll from '@/components/scroll/scroll' // 滑动组件
+  import Scroll from '@/components/base/scroll/scroll' // 滑动组件
 
   export default {
     name: 'recommend',

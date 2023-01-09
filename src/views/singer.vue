@@ -6,13 +6,20 @@
       :data="singers"
       @select="selectSinger"
     ></index-list>
-    <router-view :singer="selectedSinger"></router-view>
+    <!--给路由组件切换添加过渡动画-->
+    <router-view v-slot="{ Component }">
+      <transition appear name="slide">
+        <component :is="Component" :singer="selectedSinger"/>
+      </transition>
+    </router-view>
   </div>
 </template>
 
 <script>
   import { getSingerList } from '@/service/singer'
   import IndexList from '@/components/base/index-list/index-list'
+  import storage from 'good-storage'// 第三方缓存库
+  import { SINGER_KEY } from '@/assets/js/constant'
 
   export default {
   name: 'singer',
@@ -35,10 +42,16 @@
     // 传递点击的歌手
     selectSinger(singer) {
       this.selectedSinger = singer
+      this.cacheSinger(singer)
       // 路由跳转到歌手详情页
       this.$router.push({
         path: `/singer/${singer.mid}`
       })
+    },
+    // 缓存歌手的信息
+    cacheSinger(singer) {
+      // 当生成vue实例后，给原本不存在的属性赋值，赋值成功后的值并不会自动更新到视图上去，这个时候可以用Vue.set
+      storage.session.set(SINGER_KEY, singer)
     }
   }
 }

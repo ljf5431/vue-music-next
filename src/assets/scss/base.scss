@@ -13,11 +13,13 @@ body, html {
   position: relative;
 }
 
+// 路由切换或页面切换时的过渡动画
 .slide-enter-active, .slide-leave-active {
-  transition: all 0.3s
+  // 0.3秒的过渡动画
+  transition: all 0.5s
 }
-
 .slide-enter-from, .slide-leave-to {
+  // 横坐标偏移100%
   transform: translate3d(100%, 0, 0)
 }
 
