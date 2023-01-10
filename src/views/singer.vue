@@ -17,7 +17,7 @@
 
 <script>
   import { getSingerList } from '@/service/singer'
-  import IndexList from '@/components/base/index-list/index-list'
+  import IndexList from '@/components/base/index-list/index-list' // 歌手页面组件
   import storage from 'good-storage'// 第三方缓存库
   import { SINGER_KEY } from '@/assets/js/constant'
 
