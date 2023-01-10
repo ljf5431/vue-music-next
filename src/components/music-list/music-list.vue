@@ -16,6 +16,19 @@
       ref="bgImage"
     >
       <div
+        class="play-btn-wrapper"
+        :style="playBtnStyle"
+      >
+        <div
+          v-show="songs.length > 0"
+          class="play-btn"
+          @click="random"
+        >
+          <i class="icon-play"></i>
+          <span class="text">随机播放全部</span>
+        </div>
+      </div>
+      <div
         class="filter"
         :style="filterStyle"
       ></div>
@@ -24,6 +37,7 @@
       class="list"
       :style="scrollStyle"
       v-loading="loading"
+      v-no-result:[noResultText]="noResult"
       :probe-type="3"
       @scroll="onScroll"
     >
@@ -31,6 +45,7 @@
       <div class="song-list-wrapper">
         <song-list
           :songs="songs"
+          @select="selectItem"
         ></song-list>
       </div>
     </scroll>
@@ -40,6 +55,7 @@
 <script>
 import SongList from '@/components/base/song-list/song-list'
 import Scroll from '@/components/base/scroll/scroll'
+import { mapActions } from 'vuex'
 
 const RESERVED_HEIGHT = 40 // 标题栏的高度
 
@@ -62,7 +78,13 @@ export default {
     title: String,
     // 背景图片
     pic: String,
-    loading: Boolean
+    // loading组件的判断结果
+    loading: Boolean,
+    // 修改no-result组件的标题
+    noResultText: {
+      type: String,
+      default: '抱歉，没有找到可播放的歌曲'
+    }
   },
   data() {
     return {
@@ -75,6 +97,22 @@ export default {
     }
   },
   computed: {
+    // loading组件过后且songs数组为空时，展示无数据组件
+    noResult() {
+      return !this.loading && !this.songs.length
+    },
+    // 随机播放按钮
+    playBtnStyle() {
+      // 默认情况下display为空不修改原来的布局
+      let display = ''
+      // 当前滚动位置超过了可滚动的最大值就修改display的布局
+      if (this.scrollY >= this.maxTranslateY) {
+        display = 'none'
+      }
+      return {
+        display
+      }
+    },
     // 给背景图动态添加css属性
     bgImageStyle() {
       const scrollY = this.scrollY
@@ -146,7 +184,25 @@ export default {
     // 获取当前滚动到的位置
     onScroll(pos) {
       this.scrollY = -pos.y
-    }
+    },
+    // 提交点击的的歌曲(顺序播放)
+    selectItem({ song, index }) {
+      this.selectPlay({
+        // 当前所在的歌曲顺序列表
+        list: this.songs,
+        // 歌曲的索引
+        index
+      })
+    },
+    // 随机播放全部列表
+    random() {
+      // 传入歌曲顺序列表
+      this.randomPlay(this.songs)
+    },
+    ...mapActions([
+      'selectPlay',
+      'randomPlay'
+    ])
   }
 }
 </script>

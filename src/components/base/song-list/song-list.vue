@@ -3,8 +3,9 @@
   <ul class="song-list">
     <li
       class="item"
-      v-for="song in songs"
+      v-for="(song, index) in songs"
       :key="song.id"
+      @click="selectItem(song, index)"
     >
       <div class="content">
         <!--歌手名-->
@@ -27,9 +28,16 @@ export default {
       }
     }
   },
+  // 管理自定义事件 参数为自定义事件名
+  emits: ['select'],
   methods: {
+    // 拼接歌手名-专辑名
     getDesc(song) {
       return `${song.singer}.${song.album}`
+    },
+    // 点击发出自定义事件-select附带歌曲参数
+    selectItem(song, index) {
+      this.$emit('select', { song, index })
     }
   }
 }
