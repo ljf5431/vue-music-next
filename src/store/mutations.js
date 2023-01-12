@@ -24,6 +24,10 @@ const mutations = {
   // 修改播放组件的状态 全屏或者收起
   setFullScreen(state, fullScreen) {
     state.fullScreen = fullScreen
+  },
+  // 添加收藏或者取消收藏
+  setFavoriteList(state, list) {
+    state.favoriteList = list
   }
 }
 

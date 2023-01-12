@@ -1,3 +1,5 @@
+// 自定义指令
+
 import { createApp } from 'vue'
 import { addClass, removeClass } from '@/assets/js/dom'
 

@@ -1,3 +1,5 @@
+// loading组件逻辑
+
 export function addClass(el, className) {
   // 利用contains来判断是否包含这个样式名
   if (!el.classList.contains(className)) {

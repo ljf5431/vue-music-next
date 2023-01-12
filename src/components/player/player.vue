@@ -27,7 +27,7 @@
         <div class="operators">
           <!--切换循环模式按钮-->
           <div class="icon i-left">
-            <i class="icon-sequence"></i>
+            <i @click="changeMode" :class="modeIcon"></i>
           </div>
           <!--上一首-->
           <div class="icon i-left" :class="disableCls">
@@ -43,7 +43,7 @@
           </div>
           <!--收藏按钮-->
           <div class="icon i-right">
-            <i class="icon-not-favorite"></i>
+            <i @click="toggleFavorite(currentSong)" :class="getFavoriteList(currentSong)"></i>
           </div>
         </div>
       </div>
@@ -63,10 +63,13 @@
 import { useStore } from 'vuex'
 // watch监测Vue实例变化的一个表达式或方法。回调函数得到的参数为新值newValue和旧值oldValue
 import { computed, watch, ref } from 'vue'// 设置计算属性 动态修改页面状态
+import useMode from '@/components/player/use-mode'
+import useFavorite from './use-favorite'
 
 export default {
   name: 'player',
   setup() {
+    // data
     // audioRef 歌曲的音频url
     const audioRef = ref(null)
     // 缓冲状态 等歌曲缓存完成 避免按钮点击过快报错
@@ -80,11 +83,18 @@ export default {
     const currentSong = computed(() => store.getters.currentSong)
     // 获取歌曲的播放暂停状态
     const playing = computed(() => store.state.playing)
-    // 获取当前的播放歌曲列表
-    const playlist = computed(() => store.state.playlist)
     // 获取当前播放的歌曲索引
     const currentIndex = computed(() => store.state.currentIndex)
 
+    // hooks
+    // 播放模式切换功能-根据播放模式切换样式
+    const { changeMode, modeIcon } = useMode()
+    // 播放器收藏和取消歌曲以及样式的同步修改
+    const { getFavoriteList, toggleFavorite } = useFavorite()
+
+    // computed 播放器组件的计算属性
+    // 获取当前的播放歌曲列表
+    const playlist = computed(() => store.state.playlist)
     // 根据播放状态修改播放按钮的样式
     const playIcon = computed(() => {
       // true的话icon-pause false的话icon-play
@@ -97,6 +107,7 @@ export default {
       return songReady.value ? '' : 'disable'
     })
 
+    // watch Api 监听数据变化
     // 监听currentSong的变化 获取歌曲音频的URL
     watch(currentSong, (newSong) => {
       // 判断存不存在歌曲id或者URL
@@ -113,16 +124,6 @@ export default {
       audioEl.play()
     })
 
-    // 播放暂停按钮
-    function togglePlay() {
-      // 判断缓冲状态是否完成
-      if (!songReady.value) {
-        return
-      }
-      // 把播放器的状态取反 然后提交到vuex
-      store.commit('setPlayingState', !playing.value)
-    }
-
     // 监听播放暂停按钮的状态，实现音频的播放和暂停
     watch(playing, (newPlaying) => {
       // 判断缓冲状态是否完成
@@ -135,6 +136,17 @@ export default {
       newPlaying ? audioEl.play() : audioEl.pause()
     })
 
+    // 播放暂停按钮
+    function togglePlay() {
+      // 判断缓冲状态是否完成
+      if (!songReady.value) {
+        return
+      }
+      // 把播放器的状态取反 然后提交到vuex
+      store.commit('setPlayingState', !playing.value)
+    }
+
+    // methods 方法
     // 点击上一首按钮
     function prev() {
       const list = playlist.value
@@ -229,6 +241,10 @@ export default {
       togglePlay,
       prev,
       next,
+      changeMode,
+      modeIcon,
+      toggleFavorite,
+      getFavoriteList,
       goBack,
       pause,
       ready,
