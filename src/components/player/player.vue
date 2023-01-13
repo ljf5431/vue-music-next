@@ -22,8 +22,42 @@
         <!--歌手名-->
         <h2 class="subtitle">{{currentSong.singer}}</h2>
       </div>
+      <!--播放器唱片-->
+      <div
+        class="middle"
+      >
+        <div
+          class="middle-l"
+        >
+          <div
+            class="cd-wrapper"
+          >
+            <div
+              class="cd"
+              ref="cdRef"
+            >
+              <img ref="cdImageRef" class="image" :class="cdCls" :src="currentSong.pic">
+            </div>
+          </div>
+        </div>
+      </div>
       <!--播放器的按钮-->
       <div class="bottom">
+        <!--播放器的进度条-->
+        <div class="progress-wrapper">
+          <!--当前播放时长 调用formatTime转换毫秒数-->
+          <span class="time time-l">{{formatTime(currentTime)}}</span>
+          <div class="progress-bar-wrapper">
+            <progress-bar
+              :progress="progress"
+              @progress-changing="onProgressChanging"
+              @progress-changed="onProgressChanged"
+            ></progress-bar>
+          </div>
+          <!--总时长 调用formatTime转换毫秒数-->
+          <span class="time time-l">{{formatTime(currentSong.duration)}}</span>
+        </div>
+        <!--播放器的按钮-->
         <div class="operators">
           <!--切换循环模式按钮-->
           <div class="icon i-left">
@@ -54,6 +88,8 @@
       @pause="pause"
       @canplay="ready"
       @error="error"
+      @timeupdate="updateTime"
+      @ended="end"
     ></audio>
   </div>
 </template>
@@ -65,15 +101,26 @@ import { useStore } from 'vuex'
 import { computed, watch, ref } from 'vue'// 设置计算属性 动态修改页面状态
 import useMode from '@/components/player/use-mode'
 import useFavorite from './use-favorite'
+import useCd from '@/components/player/use-cd'
+import ProgressBar from '@/components/player/progress-bar'
+import { formatTime } from '@/assets/js/util'
+import { PLAY_MODE } from '@/assets/js/constant'
 
 export default {
   name: 'player',
+  components: {
+    ProgressBar
+  },
   setup() {
     // data
     // audioRef 歌曲的音频url
     const audioRef = ref(null)
     // 缓冲状态 等歌曲缓存完成 避免按钮点击过快报错
     const songReady = ref(false)
+    // 当前播放时长
+    const currentTime = ref(0)
+    // 定义标识 用于判断是拖动进度条还是正常播放
+    let progressChanging = false
 
     // 暂存vuex中定义好的数据仓库
     const store = useStore()
@@ -85,12 +132,16 @@ export default {
     const playing = computed(() => store.state.playing)
     // 获取当前播放的歌曲索引
     const currentIndex = computed(() => store.state.currentIndex)
+    // 获取播放器的播放模式
+    const playMode = computed(() => store.state.playMode)
 
     // hooks
     // 播放模式切换功能-根据播放模式切换样式
     const { changeMode, modeIcon } = useMode()
     // 播放器收藏和取消歌曲以及样式的同步修改
     const { getFavoriteList, toggleFavorite } = useFavorite()
+    // 旋转唱片相关逻辑
+    const { cdCls, cdRef, cdImageRef } = useCd()
 
     // computed 播放器组件的计算属性
     // 获取当前的播放歌曲列表
@@ -99,6 +150,11 @@ export default {
     const playIcon = computed(() => {
       // true的话icon-pause false的话icon-play
       return playing.value ? 'icon-pause' : 'icon-play'
+    })
+
+    // 播放进度 = 已播放时间 除以 总时长
+    const progress = computed(() => {
+      return currentTime.value / currentSong.value.duration
     })
 
     // 当用户点击过快时修改按钮修改为禁用样式
@@ -114,6 +170,8 @@ export default {
       if (!newSong.id || !newSong.url) {
         return
       }
+      // 当歌曲发生改变时重置已播放时长
+      currentTime.value = 0
       // url发生改变时修改缓冲状态
       songReady.value = false
       // 获取audio标签的DOM对象
@@ -232,12 +290,53 @@ export default {
       songReady.value = true
     }
 
+    // 获取歌曲的总时长 通过audio标签的原生属性的回调
+    function updateTime(e) {
+      // 取反 非拖动进度条时执行
+      if (!progressChanging) {
+        currentTime.value = e.target.currentTime
+      }
+    }
+
+    // 拖动进度条-手指没离开进度条时
+    function onProgressChanging(progress) {
+      progressChanging = true
+      // 已播放时间 = 总时长 * 播放进度
+      currentTime.value = currentSong.value.duration * progress
+    }
+
+    // 拖动进度条-手指离开进度条时
+    function onProgressChanged(progress) {
+      //
+      progressChanging = false
+      // 同步播放时间：音频的播放时间 = 当前的播放时间 = 拖动完成后的播放时间
+      audioRef.value.currentTime = currentTime.value = currentSong.value.duration * progress
+      // 播放器暂停时，取消暂停
+      if (!playing.value) {
+        store.commit('setPlayingState', true)
+      }
+    }
+
+    // 歌曲播放结束后自动播放下一首
+    function end() {
+      // 把播放时间重置
+      currentTime.value = 0
+      // 判断是不是循环模式
+      if (playMode.value === PLAY_MODE.loop) {
+        loop()
+      } else {
+        next()
+      }
+    }
+
     return {
       audioRef,
       fullScreen,
+      currentTime,
       currentSong,
       playIcon,
       disableCls,
+      progress,
       togglePlay,
       prev,
       next,
@@ -245,10 +344,19 @@ export default {
       modeIcon,
       toggleFavorite,
       getFavoriteList,
+      updateTime,
+      formatTime,
+      onProgressChanging,
+      onProgressChanged,
+      end,
       goBack,
       pause,
       ready,
-      error
+      error,
+      // 唱片cd
+      cdCls,
+      cdRef,
+      cdImageRef
     }
   }
 }
