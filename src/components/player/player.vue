@@ -22,12 +22,17 @@
         <!--歌手名-->
         <h2 class="subtitle">{{currentSong.singer}}</h2>
       </div>
-      <!--播放器唱片-->
+      <!--播放器唱片+歌词-->
       <div
         class="middle"
+        @touchstart.prevent="onMiddleTouchStart"
+        @touchmove.prevent="onMiddleTouchMove"
+        @touchend.prevent="onMiddleTouchEnd"
       >
+        <!--播放器唱片-->
         <div
           class="middle-l"
+          :style="middleLStyle"
         >
           <div
             class="cd-wrapper"
@@ -39,10 +44,42 @@
               <img ref="cdImageRef" class="image" :class="cdCls" :src="currentSong.pic">
             </div>
           </div>
+          <!--CD模块下的单行歌词-->
+          <div class="playing-lyric-wrapper">
+            <div class="playing-lyric">{{playingLyric}}</div>
+          </div>
         </div>
+        <!--歌词模块-->
+        <scroll
+          class="middle-r"
+          ref="lyricScrollRef"
+          :style="middleRStyle"
+        >
+          <div class="lyric-wrapper">
+            <div v-if="currentLyric" ref="lyricListRef">
+              <p
+                class="text"
+                :class="{'current': currentLineNum ===index}"
+                v-for="(line,index) in currentLyric.lines"
+                :key="line.num"
+              >
+                {{line.txt}}
+              </p>
+            </div>
+            <!--纯音乐时显示-->
+            <div class="pure-music" v-show="pureMusicLyric">
+              <p>{{pureMusicLyric}}</p>
+            </div>
+          </div>
+        </scroll>
       </div>
       <!--播放器的按钮-->
       <div class="bottom">
+        <!--播放器的模块位置指示点-->
+        <div class="dot-wrapper">
+          <span class="dot" :class="{'active' :currentShow==='cd'}"></span>
+          <span class="dot" :class="{'active' :currentShow==='lyric'}"></span>
+        </div>
         <!--播放器的进度条-->
         <div class="progress-wrapper">
           <!--当前播放时长 调用formatTime转换毫秒数-->
@@ -102,14 +139,18 @@ import { computed, watch, ref } from 'vue'// 设置计算属性 动态修改页�
 import useMode from '@/components/player/use-mode'
 import useFavorite from './use-favorite'
 import useCd from '@/components/player/use-cd'
+import useLyric from '@/components/player/use-lyric'
+import { useMiddleInteractive } from '@/components/player/use-middle-interactive'
 import ProgressBar from '@/components/player/progress-bar'
+import Scroll from '@/components/base/scroll/scroll'
 import { formatTime } from '@/assets/js/util'
 import { PLAY_MODE } from '@/assets/js/constant'
 
 export default {
   name: 'player',
   components: {
-    ProgressBar
+    ProgressBar,
+    Scroll
   },
   setup() {
     // data
@@ -142,6 +183,10 @@ export default {
     const { getFavoriteList, toggleFavorite } = useFavorite()
     // 旋转唱片相关逻辑
     const { cdCls, cdRef, cdImageRef } = useCd()
+    // 获取歌词相关逻辑
+    const { currentLyric, pureMusicLyric, playingLyric, currentLineNum, playLyric, lyricScrollRef, lyricListRef, stopLyric } = useLyric({ songReady, currentTime })
+    // 播放器模块切换
+    const { currentShow, middleLStyle, middleRStyle, onMiddleTouchStart, onMiddleTouchMove, onMiddleTouchEnd } = useMiddleInteractive()
 
     // computed 播放器组件的计算属性
     // 获取当前的播放歌曲列表
@@ -190,8 +235,16 @@ export default {
       }
       // 获取audio标签的DOM对象
       const audioEl = audioRef.value
-      // 根据按钮的整体实现音频的播放和暂停
-      newPlaying ? audioEl.play() : audioEl.pause()
+      // // 根据按钮的整体实现音频的播放和暂停
+      if (newPlaying) {
+        // 播放
+        audioEl.play()
+        playLyric()
+      } else {
+        // 暂停
+        audioEl.pause()
+        stopLyric()
+      }
     })
 
     // 播放暂停按钮
@@ -283,6 +336,7 @@ export default {
         return
       }
       songReady.value = true
+      playLyric()
     }
 
     // 设置歌曲音频有问题时 把缓冲状态设置为true 避免无法播放也不能切换的问题
@@ -303,6 +357,10 @@ export default {
       progressChanging = true
       // 已播放时间 = 总时长 * 播放进度
       currentTime.value = currentSong.value.duration * progress
+      // 根据进度条拖动距离，同步歌词位置
+      playLyric()
+      // 拖动过程中暂停歌词滚动
+      stopLyric()
     }
 
     // 拖动进度条-手指离开进度条时
@@ -315,6 +373,8 @@ export default {
       if (!playing.value) {
         store.commit('setPlayingState', true)
       }
+      // 同步歌词滚动位置
+      playLyric()
     }
 
     // 歌曲播放结束后自动播放下一首
@@ -356,7 +416,21 @@ export default {
       // 唱片cd
       cdCls,
       cdRef,
-      cdImageRef
+      cdImageRef,
+      // 歌词 lyric
+      currentLyric,
+      pureMusicLyric,
+      playingLyric,
+      currentLineNum,
+      lyricScrollRef,
+      lyricListRef,
+      // 播放器模块切换middle-interactive CD模块-歌词模块
+      currentShow,
+      middleLStyle,
+      middleRStyle,
+      onMiddleTouchStart,
+      onMiddleTouchMove,
+      onMiddleTouchEnd
     }
   }
 }

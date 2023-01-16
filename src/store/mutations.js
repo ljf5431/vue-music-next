@@ -28,6 +28,17 @@ const mutations = {
   // 添加收藏或者取消收藏
   setFavoriteList(state, list) {
     state.favoriteList = list
+  },
+  // 修改播放歌曲的歌词
+  addSongLyric(state, { song, lyric }) {
+    // 获取播放列表里的歌曲 给歌曲列表添加lyric(歌词)属性
+    state.sequenceList.map((item) => {
+      // 判断是否为同一首歌曲
+      if (item.mid === song.mid) {
+        item.lyric = lyric
+      }
+      return item
+    })
   }
 }
 
