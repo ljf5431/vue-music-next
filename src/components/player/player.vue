@@ -1,124 +1,142 @@
 <!--播放器组件-->
 <template>
-  <div class="player">
-    <!--fullScreen控制全屏和收起-->
-    <div
-      class="normal-player"
-      v-show="fullScreen"
+  <div
+    class="player"
+    v-show="playlist.length"
+  >
+    <transition
+      name="normal"
+      @enter="enter"
+      @after-enter="afterEnter"
+      @leave="leave"
+      @after-leave="afterLeave"
     >
-      <div class="background">
-        <img :src="currentSong.pic">
-      </div>
-      <div class="top">
-        <!--收起按钮-->
-        <div
-          class="back"
-          @click="goBack"
-        >
-          <i class="icon-back"></i>
-        </div>
-        <!--歌曲名-->
-        <h1 class="title">{{currentSong.name}}</h1>
-        <!--歌手名-->
-        <h2 class="subtitle">{{currentSong.singer}}</h2>
-      </div>
-      <!--播放器唱片+歌词-->
+      <!--fullScreen控制全屏和收起-->
       <div
-        class="middle"
-        @touchstart.prevent="onMiddleTouchStart"
-        @touchmove.prevent="onMiddleTouchMove"
-        @touchend.prevent="onMiddleTouchEnd"
+        class="normal-player"
+        v-show="fullScreen"
       >
-        <!--播放器唱片-->
-        <div
-          class="middle-l"
-          :style="middleLStyle"
-        >
+        <div class="background">
+          <img :src="currentSong.pic">
+        </div>
+        <div class="top">
+          <!--收起按钮-->
           <div
-            class="cd-wrapper"
+            class="back"
+            @click="goBack"
+          >
+            <i class="icon-back"></i>
+          </div>
+          <!--歌曲名-->
+          <h1 class="title">{{currentSong.name}}</h1>
+          <!--歌手名-->
+          <h2 class="subtitle">{{currentSong.singer}}</h2>
+        </div>
+        <!--播放器唱片+歌词-->
+        <div
+          class="middle"
+          @touchstart.prevent="onMiddleTouchStart"
+          @touchmove.prevent="onMiddleTouchMove"
+          @touchend.prevent="onMiddleTouchEnd"
+        >
+          <!--播放器唱片-->
+          <div
+            class="middle-l"
+            :style="middleLStyle"
           >
             <div
-              class="cd"
-              ref="cdRef"
+              ref="cdWrapperRef"
+              class="cd-wrapper"
             >
-              <img ref="cdImageRef" class="image" :class="cdCls" :src="currentSong.pic">
-            </div>
-          </div>
-          <!--CD模块下的单行歌词-->
-          <div class="playing-lyric-wrapper">
-            <div class="playing-lyric">{{playingLyric}}</div>
-          </div>
-        </div>
-        <!--歌词模块-->
-        <scroll
-          class="middle-r"
-          ref="lyricScrollRef"
-          :style="middleRStyle"
-        >
-          <div class="lyric-wrapper">
-            <div v-if="currentLyric" ref="lyricListRef">
-              <p
-                class="text"
-                :class="{'current': currentLineNum ===index}"
-                v-for="(line,index) in currentLyric.lines"
-                :key="line.num"
+              <div
+                class="cd"
+                ref="cdRef"
               >
-                {{line.txt}}
-              </p>
+                <img ref="cdImageRef" class="image" :class="cdCls" :src="currentSong.pic">
+              </div>
             </div>
-            <!--纯音乐时显示-->
-            <div class="pure-music" v-show="pureMusicLyric">
-              <p>{{pureMusicLyric}}</p>
+            <!--CD模块下的单行歌词-->
+            <div class="playing-lyric-wrapper">
+              <div class="playing-lyric">{{playingLyric}}</div>
             </div>
           </div>
-        </scroll>
-      </div>
-      <!--播放器的按钮-->
-      <div class="bottom">
-        <!--播放器的模块位置指示点-->
-        <div class="dot-wrapper">
-          <span class="dot" :class="{'active' :currentShow==='cd'}"></span>
-          <span class="dot" :class="{'active' :currentShow==='lyric'}"></span>
-        </div>
-        <!--播放器的进度条-->
-        <div class="progress-wrapper">
-          <!--当前播放时长 调用formatTime转换毫秒数-->
-          <span class="time time-l">{{formatTime(currentTime)}}</span>
-          <div class="progress-bar-wrapper">
-            <progress-bar
-              :progress="progress"
-              @progress-changing="onProgressChanging"
-              @progress-changed="onProgressChanged"
-            ></progress-bar>
-          </div>
-          <!--总时长 调用formatTime转换毫秒数-->
-          <span class="time time-l">{{formatTime(currentSong.duration)}}</span>
+          <!--歌词模块-->
+          <scroll
+            class="middle-r"
+            ref="lyricScrollRef"
+            :style="middleRStyle"
+          >
+            <div class="lyric-wrapper">
+              <div v-if="currentLyric" ref="lyricListRef">
+                <p
+                  class="text"
+                  :class="{'current': currentLineNum ===index}"
+                  v-for="(line,index) in currentLyric.lines"
+                  :key="line.num"
+                >
+                  {{line.txt}}
+                </p>
+              </div>
+              <!--纯音乐时显示-->
+              <div class="pure-music" v-show="pureMusicLyric">
+                <p>{{pureMusicLyric}}</p>
+              </div>
+            </div>
+          </scroll>
         </div>
         <!--播放器的按钮-->
-        <div class="operators">
-          <!--切换循环模式按钮-->
-          <div class="icon i-left">
-            <i @click="changeMode" :class="modeIcon"></i>
+        <div class="bottom">
+          <!--播放器的模块位置指示点-->
+          <div class="dot-wrapper">
+            <span class="dot" :class="{'active' :currentShow==='cd'}"></span>
+            <span class="dot" :class="{'active' :currentShow==='lyric'}"></span>
           </div>
-          <!--上一首-->
-          <div class="icon i-left" :class="disableCls">
-            <i @click="prev" class="icon-prev"></i>
+          <!--播放器的进度条-->
+          <div class="progress-wrapper">
+            <!--当前播放时长 调用formatTime转换毫秒数-->
+            <span class="time time-l">{{formatTime(currentTime)}}</span>
+            <div class="progress-bar-wrapper">
+              <progress-bar
+                ref="barRef"
+                :progress="progress"
+                @progress-changing="onProgressChanging"
+                @progress-changed="onProgressChanged"
+              ></progress-bar>
+            </div>
+            <!--总时长 调用formatTime转换毫秒数-->
+            <span class="time time-l">{{formatTime(currentSong.duration)}}</span>
           </div>
-          <!--播放暂停-开始-->
-          <div class="icon i-center" :class="disableCls">
-            <i @click="togglePlay" :class="playIcon"></i>
-          </div>
-          <!--下一首-->
-          <div class="icon i-right" :class="disableCls">
-            <i @click="next" class="icon-next"></i>
-          </div>
-          <!--收藏按钮-->
-          <div class="icon i-right">
-            <i @click="toggleFavorite(currentSong)" :class="getFavoriteList(currentSong)"></i>
+          <!--播放器的按钮-->
+          <div class="operators">
+            <!--切换循环模式按钮-->
+            <div class="icon i-left">
+              <i @click="changeMode" :class="modeIcon"></i>
+            </div>
+            <!--上一首-->
+            <div class="icon i-left" :class="disableCls">
+              <i @click="prev" class="icon-prev"></i>
+            </div>
+            <!--播放暂停-开始-->
+            <div class="icon i-center" :class="disableCls">
+              <i @click="togglePlay" :class="playIcon"></i>
+            </div>
+            <!--下一首-->
+            <div class="icon i-right" :class="disableCls">
+              <i @click="next" class="icon-next"></i>
+            </div>
+            <!--收藏按钮-->
+            <div class="icon i-right">
+              <i @click="toggleFavorite(currentSong)" :class="getFavoriteList(currentSong)"></i>
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    </transition>
+    <!--迷你播放器-->
+    <mini-player
+      :progress="progress"
+      :toggle-play="togglePlay"
+    ></mini-player>
     <!--定义声音-->
     <audio
       ref = 'audioRef'
@@ -135,14 +153,16 @@
 // useStore ===vue2.0中的this.$store 引用vuex中定义好的数据仓库
 import { useStore } from 'vuex'
 // watch监测Vue实例变化的一个表达式或方法。回调函数得到的参数为新值newValue和旧值oldValue
-import { computed, watch, ref } from 'vue'// 设置计算属性 动态修改页面状态
+import { computed, watch, ref, nextTick } from 'vue'// 设置计算属性 动态修改页面状态
 import useMode from '@/components/player/use-mode'
 import useFavorite from './use-favorite'
 import useCd from '@/components/player/use-cd'
 import useLyric from '@/components/player/use-lyric'
 import { useMiddleInteractive } from '@/components/player/use-middle-interactive'
+import useAnimation from '@/components/player/use-animation'
 import ProgressBar from '@/components/player/progress-bar'
 import Scroll from '@/components/base/scroll/scroll'
+import MiniPlayer from '@/components/player/mini-player'
 import { formatTime } from '@/assets/js/util'
 import { PLAY_MODE } from '@/assets/js/constant'
 
@@ -150,12 +170,15 @@ export default {
   name: 'player',
   components: {
     ProgressBar,
-    Scroll
+    Scroll,
+    MiniPlayer
   },
   setup() {
     // data
     // audioRef 歌曲的音频url
     const audioRef = ref(null)
+    // 进度条组件的实例
+    const barRef = ref(null)
     // 缓冲状态 等歌曲缓存完成 避免按钮点击过快报错
     const songReady = ref(false)
     // 当前播放时长
@@ -187,6 +210,8 @@ export default {
     const { currentLyric, pureMusicLyric, playingLyric, currentLineNum, playLyric, lyricScrollRef, lyricListRef, stopLyric } = useLyric({ songReady, currentTime })
     // 播放器模块切换
     const { currentShow, middleLStyle, middleRStyle, onMiddleTouchStart, onMiddleTouchMove, onMiddleTouchEnd } = useMiddleInteractive()
+    // 迷你播放器全屏播放器切换时CD的动画效果
+    const { cdWrapperRef, enter, afterEnter, leave, afterLeave } = useAnimation()
 
     // computed 播放器组件的计算属性
     // 获取当前的播放歌曲列表
@@ -244,6 +269,15 @@ export default {
         // 暂停
         audioEl.pause()
         stopLyric()
+      }
+    })
+
+    // 监听播放状态
+    watch(fullScreen, async (newFullScreen) => {
+      if (newFullScreen) {
+        await nextTick()
+        // 重新获取播放进度,设置偏移量
+        barRef.value.setOffset(progress.value)
       }
     })
 
@@ -390,10 +424,12 @@ export default {
     }
 
     return {
+      barRef,
       audioRef,
       fullScreen,
       currentTime,
       currentSong,
+      playlist,
       playIcon,
       disableCls,
       progress,
@@ -430,7 +466,13 @@ export default {
       middleRStyle,
       onMiddleTouchStart,
       onMiddleTouchMove,
-      onMiddleTouchEnd
+      onMiddleTouchEnd,
+      // animation
+      cdWrapperRef,
+      enter,
+      afterEnter,
+      leave,
+      afterLeave
     }
   }
 }
@@ -657,7 +699,7 @@ export default {
     }
     &.normal-enter-active, &.normal-leave-active {
       //添加过度效果
-      transition: all .6s;
+      transition: all 2s;
       .top, .bottom {
         //从开始到结束的不同速度过渡效果
         transition: all .6s cubic-bezier(0.45, 0, 0.55, 1);

@@ -56,10 +56,7 @@ export default {
   watch: {
     // 监听进度条数据progress的变化，获取一个当前进度newProgress
     progress(newProgress) {
-      // 进度条的总宽度 = 整个组件的宽度 - 圆形图标的宽度
-      const barWidth = this.$el.clientWidth - progressBtnWidth
-      // 需要偏移的量
-      this.offset = barWidth * newProgress
+      this.setOffset(newProgress)
     }
   },
   created () {
@@ -109,6 +106,13 @@ export default {
       // 新的播放进度 = 偏移量/进度条总宽度
       const progress = offsetWidth / barWidth
       this.$emit('progress-changed', progress)
+    },
+    // 重新打开全屏播放器时重新获取播放进度
+    setOffset(progress) {
+      // 进度条的总宽度 = 整个组件的宽度 - 圆形图标的宽度
+      const barWidth = this.$el.clientWidth - progressBtnWidth
+      // 需要偏移的量
+      this.offset = barWidth * progress
     }
   }
 }
