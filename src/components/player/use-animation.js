@@ -5,11 +5,17 @@ import animations from 'create-keyframe-animation'
 // 迷你播放器全屏播放器切换时CD的动画效果
 export default function useAnimation() {
   const cdWrapperRef = ref(null)
-  // let entering = false
-  // let leaving = false
+  // 标识
+  let entering = false
+  let leaving = false
 
   // 迷你CD进入全屏CD的动画效果
   function enter(el, done) {
+    // 迷你cd进入全屏CD动画没完成提前切换 移除未完成的动画效果
+    if (leaving) {
+      afterLeave()
+    }
+    entering = true
     const { x, y, scale } = getPosAndScale()
     // 定义过度效果
     const animation = {
@@ -26,7 +32,7 @@ export default function useAnimation() {
       animation,
       presets: {
         // 持续时间
-        duration: 2000,
+        duration: 600,
         // 从开始到结束的不同速度过渡效果
         easing: 'cubic-bezier(0.45, 0, 0.55, 1)'
       }
@@ -35,12 +41,18 @@ export default function useAnimation() {
   }
   // 移除迷你CD进入全屏CD的动画效果
   function afterEnter() {
+    entering = false
     animations.unregisterAnimation('move')
     cdWrapperRef.value.style.animation = ''
   }
 
   // 全屏CD进入迷你CD的动画效果
   function leave(el, done) {
+    // 全屏CD进入迷你cd动画没完成提前切换 移除未完成的动画效果
+    if (entering) {
+      afterEnter()
+    }
+    leaving = true
     const { x, y, scale } = getPosAndScale()
     // 获取动画对象的DOM
     const cdWrapperEl = cdWrapperRef.value
@@ -59,6 +71,7 @@ export default function useAnimation() {
   }
   // 移除全屏CD进入迷你CD的动画效果
   function afterLeave() {
+    leaving = false
     // 获取动画对象的DOM
     const cdWrapperEl = cdWrapperRef.value
     // 移除过度动画样式

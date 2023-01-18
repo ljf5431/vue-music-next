@@ -51,21 +51,27 @@
           ></i>
         </progress-circle>
       </div>
+      <div class="control" @click.stop="showPlaylist">
+        <i class="icon-playlist"></i>
+      </div>
+      <Playlist ref="playlistRef"></Playlist>
     </div>
   </transition>
 </template>
 
 <script>
 import { useStore } from 'vuex'
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import useCd from '@/components/player/use-cd'
 import useMiniSlider from '@/components/player/use-mini-slider'
 import ProgressCircle from '@/components/player/progress-circle'
+import Playlist from '@/components/player/playlist'
 
 export default {
   name: 'mini-player',
   components: {
-    ProgressCircle
+    ProgressCircle,
+    Playlist
   },
   props: {
     // play组件的播放进度
@@ -78,6 +84,9 @@ export default {
   },
 
   setup() {
+    // 获取播放列表的DOM对象
+    const playlistRef = ref(null)
+
     const store = useStore()
     // 播放器的收起或全屏的状态标识
     const fullScreen = computed(() => store.state.fullScreen)
@@ -102,6 +111,11 @@ export default {
       store.commit('setFullScreen', true)
     }
 
+    // 点击打开播放列表组件
+    function showPlaylist() {
+      playlistRef.value.show()
+    }
+
     return {
       fullScreen,
       currentSong,
@@ -112,7 +126,10 @@ export default {
       cdCls,
       cdRef,
       cdImageRef,
-      sliderWrapperRef
+      sliderWrapperRef,
+
+      playlistRef,
+      showPlaylist
     }
   }
 }

@@ -15,7 +15,7 @@ export default function useFavorite() {
   const maxLen = 100
 
   // 根据收藏列表内有无当前歌曲数据修改样式
-  function getFavoriteList(song) {
+  function getFavoriteIcon(song) {
     return isFavorite(song) ? 'icon-favorite' : 'icon-not-favorite'
   }
 
@@ -49,7 +49,7 @@ export default function useFavorite() {
   }
 
   return {
-    getFavoriteList,
+    getFavoriteIcon,
     toggleFavorite
   }
 }

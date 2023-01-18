@@ -59,7 +59,6 @@ export default function useMiniSlider() {
           sliderVal.on('slidePageChanged', ({ pageX }) => {
             // 提交切换过后的歌曲索引值
             store.commit('setCurrentIndex', pageX)
-            store.commit('setPlayingState', true)
           })
         } else {
           // 初始化过就调用refresh进行重新计算
@@ -76,6 +75,12 @@ export default function useMiniSlider() {
       if (sliderVal && sliderShow.value) {
         // 滚动到新的歌曲索引
         sliderVal.goToPage(newIndex, 0, 0)
+      }
+    })
+    watch(playlist, async () => {
+      if (sliderVal && sliderShow.value) {
+        await nextTick()
+        sliderVal.refresh()
       }
     })
   })

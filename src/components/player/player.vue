@@ -126,7 +126,7 @@
             </div>
             <!--收藏按钮-->
             <div class="icon i-right">
-              <i @click="toggleFavorite(currentSong)" :class="getFavoriteList(currentSong)"></i>
+              <i @click="toggleFavorite(currentSong)" :class="getFavoriteIcon(currentSong)"></i>
             </div>
           </div>
         </div>
@@ -203,7 +203,7 @@ export default {
     // 播放模式切换功能-根据播放模式切换样式
     const { changeMode, modeIcon } = useMode()
     // 播放器收藏和取消歌曲以及样式的同步修改
-    const { getFavoriteList, toggleFavorite } = useFavorite()
+    const { getFavoriteIcon, toggleFavorite } = useFavorite()
     // 旋转唱片相关逻辑
     const { cdCls, cdRef, cdImageRef } = useCd()
     // 获取歌词相关逻辑
@@ -250,6 +250,7 @@ export default {
       audioEl.src = newSong.url
       // 调用play方法进行播放音频
       audioEl.play()
+      store.commit('setPlayingState', true)
     })
 
     // 监听播放暂停按钮的状态，实现音频的播放和暂停
@@ -311,10 +312,6 @@ export default {
         }
         // 把当前的歌曲索引提交到vuex
         store.commit('setCurrentIndex', index)
-        // 如果播放器为暂停状态则点击上一首的同时修改为播放状态
-        if (!playing.value) {
-          store.commit('setPlayingState', true)
-        }
       }
     }
     // 点击下一首按钮
@@ -336,10 +333,6 @@ export default {
         }
         // 把当前的歌曲索引提交到vuex
         store.commit('setCurrentIndex', index)
-        // 如果播放器为暂停状态则点击上一首的同时修改为播放状态
-        if (!playing.value) {
-          store.commit('setPlayingState', true)
-        }
       }
     }
 
@@ -439,7 +432,7 @@ export default {
       changeMode,
       modeIcon,
       toggleFavorite,
-      getFavoriteList,
+      getFavoriteIcon,
       updateTime,
       formatTime,
       onProgressChanging,
@@ -699,7 +692,7 @@ export default {
     }
     &.normal-enter-active, &.normal-leave-active {
       //添加过度效果
-      transition: all 2s;
+      transition: all .6s;
       .top, .bottom {
         //从开始到结束的不同速度过渡效果
         transition: all .6s cubic-bezier(0.45, 0, 0.55, 1);
