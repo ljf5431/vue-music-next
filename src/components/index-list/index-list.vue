@@ -67,7 +67,7 @@
 </template>
 
 <script>
-import Scroll from '@/components/base/scroll/scroll'
+import Scroll from '@/components/wrap-scroll'
 import useFixed from './use-fixed' // 获取固定吸顶标题的内容
 import useShortcut from './use-shortcut'
 

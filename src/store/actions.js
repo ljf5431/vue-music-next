@@ -85,6 +85,19 @@ export function removeSong({ commit, state }, song) {
   commit('setSequenceList', sequenceList)
   commit('setPlaylist', playlist)
   commit('setCurrentIndex', currentIndex)
+  // 删完全部歌曲时停止播放
+  if (!playlist.length) {
+    commit('setPlayingState', false)
+  }
+}
+
+// 清空播放列表
+export function clearSongList({ commit }) {
+  // 重置并提交歌曲状态
+  commit('setSequenceList', [])
+  commit('setPlaylist', [])
+  commit('setCurrentIndex', 0)
+  commit('setPlayingState', false)
 }
 
 // 查找歌曲在列表的索引的方法

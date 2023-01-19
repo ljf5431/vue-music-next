@@ -1,4 +1,4 @@
-<!--对话框组件-->
+<!--弹窗组件-->
 <template>
   <teleport to="body">
     <transition name="confirm-fade">

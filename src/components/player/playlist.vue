@@ -18,6 +18,9 @@
               >
               </i>
               <span class="text">{{modeText}}</span>
+              <span class="clear" @click="showConfirm">
+                <i class="icon-clear"></i>
+              </span>
             </h1>
           </div>
           <scroll
@@ -57,6 +60,12 @@
             <span>关闭</span>
           </div>
         </div>
+        <confirm
+          ref="confirmRef"
+          text="是否清空播放列表？"
+          confirm-btn-text="清空"
+          @confirm="confirmClear"
+        ></confirm>
       </div>
     </transition>
   </teleport>
@@ -64,6 +73,7 @@
 
 <script>
 import Scroll from '@/components/base/scroll/scroll'
+import Confirm from '@/components/base/confirm/confirm'
 import { computed, nextTick, ref, watch } from 'vue'
 import { useStore } from 'vuex'
 import useMode from '@/components/player/use-mode'
@@ -72,7 +82,8 @@ import useFavorite from '@/components/player/use-favorite'
 export default {
   name: 'playlist',
   components: {
-    Scroll
+    Scroll,
+    Confirm
   },
   setup() {
     // 可见标识
@@ -83,6 +94,8 @@ export default {
     const scrollRef = ref(null)
     // 播放列表的DOM
     const listRef = ref(null)
+    //  弹窗组件的组件实例
+    const confirmRef = ref(null)
 
     const store = useStore()
     // 获取播放列表
@@ -164,9 +177,23 @@ export default {
       removing.value = true
       // dispatch含有异步操作，数据提交至 actions
       store.dispatch('removeSong', song)
+      if (!playlist.value.length) {
+        hide()
+      }
       setTimeout(() => {
         removing.value = false
       }, 300)
+    }
+
+    // 点击打开弹窗组件
+    function showConfirm() {
+      confirmRef.value.show()
+    }
+
+    function confirmClear() {
+      // dispatch含有异步操作，数据提交至 actions
+      store.dispatch('clearSongList')
+      hide()
     }
 
     return {
@@ -174,6 +201,7 @@ export default {
       removing,
       scrollRef,
       listRef,
+      confirmRef,
       playlist,
       sequenceList,
       getCurrentIcon,
@@ -181,6 +209,8 @@ export default {
       hide,
       selectItem,
       removeSong,
+      showConfirm,
+      confirmClear,
 
       modeIcon,
       modeText,

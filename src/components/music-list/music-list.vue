@@ -54,8 +54,8 @@
 
 <script>
 import SongList from '@/components/base/song-list/song-list'
-import Scroll from '@/components/base/scroll/scroll'
-import { mapActions } from 'vuex'
+import Scroll from '@/components/wrap-scroll'
+import { mapActions, mapState } from 'vuex'
 
 const RESERVED_HEIGHT = 40 // 标题栏的高度
 
@@ -150,8 +150,10 @@ export default {
     },
     // 给歌曲列表动态添加top属性
     scrollStyle() {
+      const bottom = this.playlist.length ? '60px' : '0'
       return {
-        top: `${this.imageHeight}px`
+        top: `${this.imageHeight}px`,
+        bottom
       }
     },
     // 向上滑动时给背景图添加模糊效果
@@ -169,7 +171,11 @@ export default {
         // 模糊效果
         backdropFilter: `blur(${blur}px)`
       }
-    }
+    },
+    // 获取正在播放的歌曲播放列表
+    ...mapState([
+      'playlist'
+    ])
   },
   mounted () {
     // 获取背景图的高度
