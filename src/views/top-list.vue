@@ -41,7 +41,7 @@
 
 <script>
 import Scroll from '@/components/base/scroll/scroll'
-import { getTopList } from '@/store/top-list'
+import { getTopList } from '@/service/top-list'
 import storage from '_good-storage@1.1.1@good-storage'
 import { TOP_KEY } from '@/assets/js/constant'
 

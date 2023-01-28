@@ -14,7 +14,7 @@
 
 <script>
 import createDetailComponent from '@/assets/js/create-detail-component'
-import { getTopDetail } from '@/store/top-list'
+import { getTopDetail } from '@/service/top-list'
 import { TOP_KEY } from '@/assets/js/constant'
 
 export default createDetailComponent('top-detail', TOP_KEY, getTopDetail)
