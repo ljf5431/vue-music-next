@@ -37,13 +37,20 @@
 
       </div>
     </scroll>
+    <router-view v-slot="{ Component }">
+      <transition appear name="slide">
+        <component :is="Component" :data="selectedAlbum"/>
+      </transition>
+    </router-view>
   </div>
 </template>
 
 <script>
   import { getRecommend } from '@/service/recommend' // 轮播图的请求方法
   import Slider from '@/components/base/slider/slider' // 轮播图组件
-  import Scroll from '@/components/wrap-scroll' // 滑动组件
+  import Scroll from '@/components/wrap-scroll'// 滑动组件
+  import storage from 'good-storage'
+  import { ALBUM_KEY } from '@/assets/js/constant'
 
   export default {
     name: 'recommend',
@@ -54,7 +61,8 @@
     data() {
       return {
         sliders: [],
-        albums: []
+        albums: [],
+        selectedAlbum: null
       }
     },
     computed: {
@@ -69,6 +77,21 @@
       this.sliders = result.sliders
       this.albums = result.albums
       console.log(result)
+    },
+    methods: {
+      selectItem(album) {
+        this.selectedAlbum = album
+        this.cacheAlbum(album)
+        // 跳转到歌单详情页
+        this.$router.push({
+          path: `/recommend/${album.id}`
+        })
+      },
+      // 缓存歌单的信息
+      cacheAlbum(album) {
+        // 当生成vue实例后，给原本不存在的属性赋值，赋值成功后的值并不会自动更新到视图上去，这个时候可以用Vue.set
+        storage.session.set(ALBUM_KEY, album)
+      }
     }
   }
 </script>

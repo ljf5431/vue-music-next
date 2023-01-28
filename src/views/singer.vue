@@ -9,7 +9,7 @@
     <!--给路由组件切换添加过渡动画-->
     <router-view v-slot="{ Component }">
       <transition appear name="slide">
-        <component :is="Component" :singer="selectedSinger"/>
+        <component :is="Component" :data="selectedSinger"/>
       </transition>
     </router-view>
   </div>

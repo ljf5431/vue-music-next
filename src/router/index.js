@@ -5,6 +5,8 @@ import Singer from '@/views/singer'
 import TopList from '@/views/top-list'
 import Search from '@/views/search'
 import SingerDetail from '@/views/singer-detail'
+import Album from '@/views/album'
+import TopDetail from '@/views/top-detail'
 
 const routes = [
   {
@@ -15,7 +17,13 @@ const routes = [
   {
     // 推荐页面路径
     path: '/recommend',
-    component: Recommend
+    component: Recommend,
+    children: [
+      {
+        path: ':id',
+        component: Album
+      }
+    ]
   },
   {
     // 歌手页面路径
@@ -32,7 +40,13 @@ const routes = [
   {
     // 排行页面路径
     path: '/top-list',
-    component: TopList
+    component: TopList,
+    children: [
+      {
+        path: ':id',
+        component: TopDetail
+      }
+    ]
   },
   {
     // 搜索页面路径
