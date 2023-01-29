@@ -39,6 +39,11 @@ const mutations = {
       }
       return item
     })
+  },
+  // 添加到搜索历史
+  setSearchHistory(state, searches) {
+    // searches搜索历史数组
+    state.searchHistory = searches
   }
 }
 

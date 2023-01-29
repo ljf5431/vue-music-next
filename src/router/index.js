@@ -51,7 +51,13 @@ const routes = [
   {
     // 搜索页面路径
     path: '/search',
-    component: Search
+    component: Search,
+    children: [
+      {
+        path: ':id',
+        component: SingerDetail
+      }
+    ]
   }
 ]
 

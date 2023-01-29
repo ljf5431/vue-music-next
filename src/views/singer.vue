@@ -29,6 +29,7 @@
   data() {
     return {
       singers: [],
+      // 点击的歌手
       selectedSinger: null
     }
   },

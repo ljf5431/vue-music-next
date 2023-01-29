@@ -7,7 +7,9 @@ export function getHotKeys() {
 // 搜索内容请求
 export function search(query, page, showSinger) {
   return get('/api/search', {
+    // 搜索框输入的内容
     query,
+    // 页码
     page,
     showSinger
   })

@@ -49,7 +49,7 @@ export function changeMode({ commit, state, getters }, mode) { // mode=Playlist�
     // 顺序-循环模式 直接提交播放器原来的歌曲顺序列表
     commit('setPlaylist', state.sequenceList)
   }
-  // 在新的列表里查找原来播放的歌曲的id
+  // 在新列表里查找原来播放的歌曲的id
   const index = state.playlist.findIndex((song) => {
     return song.id === currentId
   })
@@ -98,6 +98,42 @@ export function clearSongList({ commit }) {
   commit('setPlaylist', [])
   commit('setCurrentIndex', 0)
   commit('setPlayingState', false)
+}
+
+// 点击搜索结果列表中的歌曲 添加到播放列表
+export function addSong({ commit, state }, song) {
+  // 正在播放的歌曲播放列表
+  const playlist = state.playlist.slice()
+  // 获取歌曲顺序列表
+  const sequenceList = state.sequenceList.slice()
+  // 列表内播放歌曲的索引
+  let currentIndex = state.currentIndex
+  // 在playlist中查找这首歌
+  const playIndex = findIndex(playlist, song)
+
+  // playIndex大于-1说明列表存在这首歌的索引值
+  if (playIndex > -1) {
+    // 修改当前播放歌曲的索引为playIndex
+    currentIndex = playIndex
+  } else {
+    // 添加到播放列表中
+    playlist.push(song)
+    // 修改当前播放歌曲的索引为playlist的最后一首
+    currentIndex = playlist.length - 1
+  }
+
+  // 在原始的播放列表中查找这首歌曲索引 没有则添加到列表
+  const sequenceIndex = findIndex(sequenceList, song)
+  if (sequenceIndex === -1) {
+    sequenceList.push(song)
+  }
+
+  // 提交修改过的歌曲状态
+  commit('setSequenceList', sequenceList)
+  commit('setPlaylist', playlist)
+  commit('setCurrentIndex', currentIndex)
+  commit('setPlayingState', true)
+  commit('setFullScreen', true)
 }
 
 // 查找歌曲在列表的索引的方法

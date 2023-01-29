@@ -55,3 +55,9 @@ export function remove(key, compare) {
 export function load(key) {
   return storage.get(key, [])
 }
+
+// 清空某一个key下的本地存储数据
+export function clear(key) {
+  storage.remove(key)
+  return []
+}

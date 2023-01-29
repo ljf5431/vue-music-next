@@ -1,7 +1,7 @@
 // 全局的数据仓库
 
 // 歌手的唯一标识id 收藏歌曲的标识id
-import { PLAY_MODE, FAVORITE_KEY } from '@/assets/js/constant'
+import { PLAY_MODE, FAVORITE_KEY, SEARCH_KEY } from '@/assets/js/constant'
 // 读取本地缓存
 import { load } from '@/assets/js/array-store'
 
@@ -20,7 +20,9 @@ const state = {
   // 播放器的状态 全屏或者收起
   fullScreen: false,
   // 收藏列表:读取本地缓存
-  favoriteList: load(FAVORITE_KEY)
+  favoriteList: load(FAVORITE_KEY),
+  // 搜索历史列表:读取本地缓存
+  searchHistory: load(SEARCH_KEY)
 }
 
 // 初始化完成后导出
