@@ -7,6 +7,7 @@ import Search from '@/views/search'
 import SingerDetail from '@/views/singer-detail'
 import Album from '@/views/album'
 import TopDetail from '@/views/top-detail'
+import UserCenter from '@/views/user-center'
 
 const routes = [
   {
@@ -58,6 +59,14 @@ const routes = [
         component: SingerDetail
       }
     ]
+  },
+  {
+    // 个人中心页面
+    path: '/user',
+    // 给路由单独配置切换动画
+    components: {
+      user: UserCenter
+    }
   }
 ]
 

@@ -5,9 +5,34 @@ import store from './store'
 import lazyPlugin from 'vue3-lazy'
 import loadingDirective from '@/components/base/loading/directive'
 import noResultDirective from '@/components/base/no-result/directive'
+import { load, saveAll } from '@/assets/js/array-store'
+import { FAVORITE_KEY, PLAY_KEY } from '@/assets/js/constant'
+import { processSongs } from '@/service/song'
 
 // 引入全局样式文件
 import '@/assets/scss/index.scss'
+
+// 读取本地存储的收藏列表
+const favoriteSongs = load(FAVORITE_KEY)
+// 本地的收藏列表存在歌曲则批量请求歌曲的url,避免url过期
+if (favoriteSongs.length > 0) {
+  // 调用processSongs方法发送请求 重新获取歌曲的url
+  processSongs(favoriteSongs).then((songs) => {
+    store.commit('setFavoriteList', songs)
+    saveAll(songs, FAVORITE_KEY)
+  })
+}
+
+// 读取本地存储的播放历史列表
+const historySongs = load(PLAY_KEY)
+// 本地的播放历史列表存在歌曲则批量请求歌曲的url,避免url过期
+if (historySongs.length > 0) {
+  // 调用processSongs方法发送请求 重新获取歌曲的url
+  processSongs(historySongs).then((songs) => {
+    store.commit('setPlayHistory', songs)
+    saveAll(songs, PLAY_KEY)
+  })
+}
 
 createApp(App).use(store).use(router).use(lazyPlugin, {
   loading: require('@/assets/images/default.png')

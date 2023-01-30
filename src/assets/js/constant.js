@@ -9,6 +9,8 @@ export const ALBUM_KEY = '__album__'
 export const TOP_KEY = '__top__'
 // 搜索历史的标识id
 export const SEARCH_KEY = '__search__'
+// 当前播放歌曲的标识id
+export const PLAY_KEY = '__play__'
 
 // 播放顺序的标识
 export const PLAY_MODE = {

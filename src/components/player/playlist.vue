@@ -56,6 +56,12 @@
               </li>
             </transition-group>
           </scroll>
+          <div class="list-add">
+            <div class="add" @click="showAddSong">
+              <i class="icon-add"></i>
+              <span class="text">添加歌曲到队列</span>
+            </div>
+          </div>
           <div class="list-footer" @click.stop="hide">
             <span>关闭</span>
           </div>
@@ -66,6 +72,7 @@
           confirm-btn-text="清空"
           @confirm="confirmClear"
         ></confirm>
+        <add-song ref="addSongRef"></add-song>
       </div>
     </transition>
   </teleport>
@@ -74,6 +81,7 @@
 <script>
 import Scroll from '@/components/base/scroll/scroll'
 import Confirm from '@/components/base/confirm/confirm'
+import AddSong from '@/components/add-song/add-song'
 import { computed, nextTick, ref, watch } from 'vue'
 import { useStore } from 'vuex'
 import useMode from '@/components/player/use-mode'
@@ -83,7 +91,8 @@ export default {
   name: 'playlist',
   components: {
     Scroll,
-    Confirm
+    Confirm,
+    AddSong
   },
   setup() {
     // 可见标识
@@ -96,6 +105,8 @@ export default {
     const listRef = ref(null)
     //  弹窗组件的组件实例
     const confirmRef = ref(null)
+    //  添加歌曲到列表组件的组件实例
+    const addSongRef = ref(null)
 
     const store = useStore()
     // 获取播放列表
@@ -196,12 +207,18 @@ export default {
       hide()
     }
 
+    // 打开 添加歌曲到列表组件
+    function showAddSong() {
+      addSongRef.value.show()
+    }
+
     return {
       visible,
       removing,
       scrollRef,
       listRef,
       confirmRef,
+      addSongRef,
       playlist,
       sequenceList,
       getCurrentIcon,
@@ -211,6 +228,7 @@ export default {
       removeSong,
       showConfirm,
       confirmClear,
+      showAddSong,
 
       modeIcon,
       modeText,

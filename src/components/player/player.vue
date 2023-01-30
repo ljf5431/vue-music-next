@@ -160,6 +160,7 @@ import useCd from '@/components/player/use-cd'
 import useLyric from '@/components/player/use-lyric'
 import { useMiddleInteractive } from '@/components/player/use-middle-interactive'
 import useAnimation from '@/components/player/use-animation'
+import usePlayHistory from '@/components/player/use-play-history'
 import ProgressBar from '@/components/player/progress-bar'
 import Scroll from '@/components/base/scroll/scroll'
 import MiniPlayer from '@/components/player/mini-player'
@@ -212,6 +213,8 @@ export default {
     const { currentShow, middleLStyle, middleRStyle, onMiddleTouchStart, onMiddleTouchMove, onMiddleTouchEnd } = useMiddleInteractive()
     // 迷你播放器全屏播放器切换时CD的动画效果
     const { cdWrapperRef, enter, afterEnter, leave, afterLeave } = useAnimation()
+    // 添加歌曲到播放历史
+    const { savePlay } = usePlayHistory()
 
     // computed 播放器组件的计算属性
     // 获取当前的播放歌曲列表
@@ -364,6 +367,7 @@ export default {
       }
       songReady.value = true
       playLyric()
+      savePlay(currentSong.value)
     }
 
     // 设置歌曲音频有问题时 把缓冲状态设置为true 避免无法播放也不能切换的问题

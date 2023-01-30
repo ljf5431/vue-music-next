@@ -7,8 +7,14 @@ function inertArray(arr, val, compare, maxLen) {
   // 暂存当前歌曲的id
   const index = arr.findIndex(compare)
   // 大于-1说明存在于数据列表中
-  if (index > -1) {
+  // 等于0 说明存在于数据列表并位于第一
+  if (index === 0) {
     return
+  }
+  // 大于0 说明在数据列表 但不在第一位
+  if (index > 0) {
+    // 删除掉 后面执行unshift插入到首位
+    arr.splice(index, 1)
   }
   // 插入到缓存数据的最前面
   arr.unshift(val)
@@ -60,4 +66,10 @@ export function load(key) {
 export function clear(key) {
   storage.remove(key)
   return []
+}
+
+// 整个数组到本地存储
+export function saveAll(items, key) {
+  // 把整个数据存储到缓存数据中
+  storage.set(key, items)
 }

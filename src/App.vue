@@ -3,6 +3,16 @@
   <tab></tab>
 <!--router-view：承载对应的路由视图-组件的内容-->
   <router-view :style="viewStyle"></router-view>
+  <!--给路由组件切换添加过渡动画-->
+  <router-view
+    :style="viewStyle"
+    name="user"
+    v-slot="{ Component }"
+  >
+    <transition appear name="slide">
+      <component :is="Component"/>
+    </transition>
+  </router-view>
   <player></player>
 </template>
 
