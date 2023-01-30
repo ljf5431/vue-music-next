@@ -1,7 +1,7 @@
 // 迷你播放器的滑动切换相关逻辑
 
 import { useStore } from 'vuex'
-import { ref, computed, onMounted, onUnmounted, watch, nextTick } from 'vue'
+import { ref, computed, onMounted, onUnmounted, watch, nextTick, onActivated, onDeactivated } from 'vue'
 import BScroll from '@better-scroll/core'
 import Slide from '@better-scroll/slide'
 // Vue.use ()的作用是 通过全局方法 Vue.use () 使用插件
@@ -90,6 +90,16 @@ export default function useMiniSlider() {
     if (slider.value) {
       slider.value.destroy()
     }
+  })
+
+  // 被keep-alive缓存的组件激活时调用
+  onActivated(() => {
+    slider.value.enable()
+    slider.value.refresh()
+  })
+  // 被keep-alive缓存的组件停用时调用
+  onDeactivated(() => {
+    slider.value.disable()
   })
 
   return {

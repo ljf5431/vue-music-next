@@ -2,7 +2,12 @@
   <m-header></m-header>
   <tab></tab>
 <!--router-view：承载对应的路由视图-组件的内容-->
-  <router-view :style="viewStyle"></router-view>
+  <router-view :style="viewStyle" v-slot="{ Component }">
+<!--keep-alive把组件临时缓存到本地-->
+    <keep-alive>
+      <component :is="Component"/>
+    </keep-alive>
+  </router-view>
   <!--给路由组件切换添加过渡动画-->
   <router-view
     :style="viewStyle"
@@ -10,7 +15,9 @@
     v-slot="{ Component }"
   >
     <transition appear name="slide">
-      <component :is="Component"/>
+      <keep-alive>
+        <component :is="Component"/>
+      </keep-alive>
     </transition>
   </router-view>
   <player></player>
