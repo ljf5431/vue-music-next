@@ -15,8 +15,9 @@ module.exports = {
     }
   },
   devServer: {
-    before(app) {
-      registerRouter(app)
+    setupMiddlewares: (middlewares, devServer) => {
+      registerRouter(devServer.app)
+      return middlewares
     }
   },
   configureWebpack: (config) => {
