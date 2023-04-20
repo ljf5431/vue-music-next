@@ -73,7 +73,7 @@ import { computed, nextTick, ref, watch } from 'vue'
 import { getHotKeys } from '@/service/search'
 import { useStore } from 'vuex'
 import { useRouter } from 'vue-router'
-import storage from '_good-storage@1.1.1@good-storage'
+import storage from 'good-storage'
 import { SINGER_KEY } from '@/assets/js/constant'
 import useSearchHistory from '@/components/search/use-search-history'
 

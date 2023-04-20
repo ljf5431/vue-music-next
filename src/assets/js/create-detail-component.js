@@ -1,5 +1,5 @@
 import MusicList from '@/components/music-list/music-list'
-import storage from '_good-storage@1.1.1@good-storage'
+import storage from 'good-storage'
 import { processSongs } from '@/service/song'
 
 // 创建详情页面的逻辑封装
