@@ -15,6 +15,8 @@ module.exports = {
     }
   },
   devServer: {
+    historyApiFallback: true,
+    allowedHosts: 'all',
     setupMiddlewares: (middlewares, devServer) => {
       registerRouter(devServer.app)
       return middlewares
